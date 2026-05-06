@@ -1,0 +1,310 @@
+<!-- v9.1_PRO: single corrected build with Samsung/iPhone compact payload and 13% logo -->
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>QR-kode Generator — v9.1 PRO</title>
+<style>
+  body{font-family:Arial,monospace;background:#f9fafb;margin:0;padding:18px;color:#111827;}
+  h1{font-size:24px;margin-bottom:6px;}
+  .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;}
+  .card{background:#fff;padding:16px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);}
+  label{display:block;margin-top:10px;font-weight:700;font-size:15px;}
+  input,select,textarea{width:100%;padding:9px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px;font-family:Arial,monospace;box-sizing:border-box;}
+  textarea{resize:vertical;}
+  .row{display:flex;gap:8px;align-items:center;}
+  .row .flex1{flex:1;}
+  .row .w90{width:90px;}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  button{padding:10px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600;}
+  .btn-primary{background:#111827;color:#fff;}
+  .btn-ghost{background:#eef2ff;color:#111827;}
+  .muted{font-size:13px;color:#6b7280;margin-top:8px;}
+  #preview{display:flex;flex-direction:column;align-items:center;gap:8px;min-height:380px;justify-content:center;}
+  #preview canvas{max-width:100%;height:auto;border-radius:8px;background:#fff;padding:8px;border:1px solid #e6e9ef;}
+  .note{font-size:12px;color:#6b7280;margin-top:8px;}
+  .version{font-size:12px;color:#6b7280;text-align:center;margin-top:14px;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>QR-kode Generator — v9.1 PRO</h1>
+    <div class="muted">Alle skabeloner + ubeskadiget sort/hvid ROCKWOOL-logo indlejret (13% bredde, korrekt aspect ratio).</div>
+
+    <label for="template">Skabelon</label>
+    <select id="template">
+      <option value="lager" selected>Lager</option>
+      <option value="custom">Fri tekst / URL</option>
+      <option value="wifi">Wi-Fi</option>
+      <option value="vcard">vCard</option>
+      <option value="sms">SMS</option>
+      <option value="varenummer">Varenummer</option>
+      <option value="bestilling">Bestilling</option>
+    </select>
+
+    <div id="templateFields" style="margin-top:8px"></div>
+
+    <label for="overlay">Overlay-tekst (vises under QR kun hvis udfyldt)</label>
+    <input id="overlay" placeholder="Fx: SCAN ME" type="text"/>
+
+    <div class="controls">
+      <button class="btn-primary" id="btnGenerate">Generér</button>
+      <button class="btn-ghost" id="btnUpdate">Opdater</button>
+      <button class="btn-ghost" id="btnDownload">Download</button>
+      <button class="btn-ghost" id="btnCopy">Kopiér</button>
+      <button class="btn-ghost" id="btnReset">Nulstil</button>
+    </div>
+
+    <div class="version">Version 9.1 PRO - Samsung+iPhone kompatibel</div>
+  </div>
+
+  <div class="card">
+    <div id="preview"><div class="note">Udfyld felter og tryk <strong>Generér</strong>.</div></div>
+  </div>
+</div>
+
+<script>
+const logoBase64 = "data:image/png;base64,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";
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const templateSelect = document.getElementById('template');
+  const templateFields = document.getElementById('templateFields');
+  const preview = document.getElementById('preview');
+  const overlayInput = document.getElementById('overlay');
+  const btnGenerate = document.getElementById('btnGenerate');
+  const btnUpdate = document.getElementById('btnUpdate');
+  const btnDownload = document.getElementById('btnDownload');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  const logo = new Image();
+  logo.src = logoBase64;
+
+  function buildLager(){
+    templateFields.innerHTML = `
+      <label>1) Område</label><input id="lagerOmr" type="text" placeholder="Område">
+      <label>2) Varenummer</label><input id="lagerVnr" type="text" placeholder="Varenummer">
+      <label>3) Materiale</label><input id="lagerMat" type="text" placeholder="Materiale">
+      <label>3,1) Operatør info</label><input id="lagerOperatoer" type="text" placeholder="Operatør">
+      <label>4) Antal</label>
+      <div class="row">
+        <input id="lagerAntal" class="flex1" type="text" placeholder="Antal">
+        <select id="lagerEnhed" class="w90">
+          <option value="">Enhed</option><option value="PL">PL</option><option value="RULL">RULL</option><option value="KS">KS</option><option value="ST">ST</option><option value="FL">FL</option><option value="DUNK">DUNK</option>
+        </select>
+        <select id="lagerIPaa" class="w90"><option value="">PL / KS</option><option value="KS">KS</option><option value="PL">PL</option></select>
+      </div>
+
+      <label>5) Mål (mm / kg)</label>
+      <div class="row">
+        <input id="lagerL" type="text" placeholder="L (mm)">
+        <input id="lagerB" type="text" placeholder="B (mm)">
+        <input id="lagerT" type="text" placeholder="T (my)">
+        <input id="lagerV" type="text" placeholder="V (kg)">
+      </div>
+
+      <label>6) Meter & Areal</label>
+      <div class="row"><input id="lagerM" type="text" placeholder="Meter (M)"><input id="lagerM2" type="text" placeholder="Areal (m²)"></div>
+
+      <label>7) Anden info</label><textarea id="lagerInfo" rows="3" placeholder="Anden info"></textarea>
+
+      <label>8) Lagerplads</label>
+      <div class="row"><input id="lagerOmraade" type="text" placeholder="Lager/Område"><input id="lagerReol" type="text" placeholder="Reol"><input id="lagerHylde" type="text" placeholder="Hylde"><input id="lagerPlads" type="text" placeholder="Plads"></div>
+
+      <label>9) Kemi</label><input id="lagerKemi" type="text" placeholder="UN-nummer (fx 1209)">
+    `;
+  }
+
+  function buildCustom(){ templateFields.innerHTML = '<label>Tekst / URL</label><textarea id="customText" rows="4"></textarea>'; }
+  function buildWifi(){ templateFields.innerHTML = '<label>SSID</label><input id="wifiSsid" type="text"><label>Password</label><input id="wifiPass" type="text"><label>Kryptering</label><select id="wifiType"><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">Ingen</option></select>'; }
+  function buildVcard(){ templateFields.innerHTML = '<label>Navn</label><input id="vName" type="text"><label>Telefon</label><input id="vTel" type="text"><label>Email</label><input id="vEmail" type="text">'; }
+  function buildSms(){ templateFields.innerHTML = '<label>Telefonnummer</label><input id="smsNum" type="text"><label>Besked</label><textarea id="smsMsg" rows="4"></textarea>'; }
+  function buildVarenr(){ templateFields.innerHTML = '<label>Materiale-nummer</label><input id="vareNr" type="text">'; }
+  function buildBestil(){ templateFields.innerHTML = '<label>Varenummer</label><input id="bestilNr" type="text"><label>Beskrivelse</label><textarea id="bestilBeskrivelse" rows="3"></textarea>'; }
+
+  function renderTemplateFields(){
+    const t = templateSelect.value;
+    if(t === 'lager') buildLager();
+    else if(t === 'custom') buildCustom();
+    else if(t === 'wifi') buildWifi();
+    else if(t === 'vcard') buildVcard();
+    else if(t === 'sms') buildSms();
+    else if(t === 'varenummer') buildVarenr();
+    else if(t === 'bestilling') buildBestil();
+  }
+
+  function getQRText(){
+    const t = templateSelect.value;
+    if(t === 'lager'){
+      const f = id=>document.getElementById(id)?.value.trim()||'';
+      const omr=f('lagerOmr'),vnr=f('lagerVnr'),mat=f('lagerMat'),
+            antal=f('lagerAntal'),enhed=f('lagerEnhed'),ipaa=f('lagerIPaa'),
+            L=f('lagerL'),B=f('lagerB'),T=f('lagerT'),V=f('lagerV'),
+            M=f('lagerM'),M2=f('lagerM2'),info=f('lagerInfo'),
+            omraade=f('lagerOmraade'),
+            reol=f('lagerReol'),hylde=f('lagerHylde'),plads=f('lagerPlads'),
+            kemi=f('lagerKemi'),
+            oper=f('lagerOperatoer');
+      const parts=[];
+      if(omr) parts.push(`O:${omr}`);
+      if(vnr) parts.push(`VN:${vnr}`);
+      if(mat) parts.push(`MA:${mat}`);
+      if(oper) parts.push(`OP:${oper}`);
+      if(antal){
+        let aval = antal;
+        if(enhed) aval += enhed;
+        if(ipaa==='KS') aval += '/KS';
+        else if(ipaa==='PL') aval += '/PL';
+        parts.push(`A:${aval}`);
+      }
+      if(L) parts.push(`L:${L}`);
+      if(B) parts.push(`B:${B}`);
+      if(T) parts.push(`T:${T}`);
+      if(V) parts.push(`V:${V}`);
+      if(M) parts.push(`M:${M}`);
+      if(M2) parts.push(`A2:${M2}`);
+      if(info) parts.push(`AI:${info}`);
+      if(omraade) parts.push(`LO:${omraade}`);
+      if(reol) parts.push(`RE:${reol}`);
+      if(hylde) parts.push(`HY:${hylde}`);
+      if(plads) parts.push(`PL:${plads}`);
+      if(kemi) parts.push(`KE:${kemi.replace(/^UN/i,'')}`);
+      return parts.join('|');
+    }
+    if(t === 'custom') return document.getElementById('customText').value||'';
+    if(t === 'wifi') return `WIFI:T:${document.getElementById('wifiType').value||'WPA'};S:${document.getElementById('wifiSsid').value||''};P:${document.getElementById('wifiPass').value||''};;`;
+    if(t === 'vcard') return `BEGIN:VCARD
+VERSION:3.0
+FN:${document.getElementById('vName').value||''}
+TEL:${document.getElementById('vTel').value||''}
+EMAIL:${document.getElementById('vEmail').value||''}
+END:VCARD`;
+    if(t === 'sms') return `SMSTO:${document.getElementById('smsNum').value||''}:${document.getElementById('smsMsg').value||''}`;
+    if(t === 'varenummer') return document.getElementById('vareNr').value||'';
+    if(t === 'bestilling') return `VN:${document.getElementById('bestilNr').value||''}|BE:${document.getElementById('bestilBeskrivelse').value||''}`;
+    return '';
+  }
+
+  async function generateQR(){
+    try{
+      const content = getQRText();
+      preview.innerHTML = '';
+      if(!content.trim()){
+        preview.innerHTML = '<div class="note">Udfyld felter for at generere QR.</div>';
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      await QRCode.toCanvas(canvas, content, {
+        width: 420,
+        margin: 2,
+        errorCorrectionLevel: 'M',
+        color: { dark: '#000000', light: '#ffffff' }
+      });
+
+      await new Promise((resolve,reject)=>{
+        if(logo.complete && logo.naturalWidth!==0) resolve();
+        else {
+          logo.onload = ()=>resolve();
+          logo.onerror = ()=>reject(new Error('Logo kunne ikke indlæses'));
+        }
+      });
+
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+
+      const naturalW = logo.naturalWidth || 1;
+      const naturalH = logo.naturalHeight || 1;
+      const ratio = naturalH / naturalW;
+
+      const logoW = Math.floor(size * 0.13);
+      const logoH = Math.max(1, Math.floor(logoW * ratio));
+
+      const x = Math.floor((size - logoW) / 2);
+      const y = Math.floor((size - logoH) / 2);
+
+      const pad = Math.ceil(Math.max(logoW, logoH) * 0.10);
+      const bgW = logoW + pad * 2;
+      const bgH = logoH + pad * 2;
+      const bx = x - pad;
+      const by = y - pad;
+
+      ctx.fillStyle = '#ffffff';
+      const r = Math.ceil(Math.max(bgW, bgH) * 0.06);
+      ctx.beginPath();
+      ctx.moveTo(bx + r, by);
+      ctx.lineTo(bx + bgW - r, by);
+      ctx.quadraticCurveTo(bx + bgW, by, bx + bgW, by + r);
+      ctx.lineTo(bx + bgW, by + bgH - r);
+      ctx.quadraticCurveTo(bx + bgW, by + bgH, bx + bgW - r, by + bgH);
+      ctx.lineTo(bx + r, by + bgH);
+      ctx.quadraticCurveTo(bx, by + bgH, bx, by + bgH - r);
+      ctx.lineTo(bx, by + r);
+      ctx.quadraticCurveTo(bx, by, bx + r, by);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(logo, x, y, logoW, logoH);
+
+      preview.appendChild(canvas);
+
+      const ov = overlayInput.value.trim();
+      if(ov){
+        const p = document.createElement('div');
+        p.style.fontWeight='700';
+        p.style.marginTop='6px';
+        p.style.fontSize='16px';
+        p.textContent = ov;
+        preview.appendChild(p);
+      }
+
+    }catch(err){
+      preview.innerHTML = '<div class="note" style="color:red;">Fejl: ' + (err.message || err) + '</div>';
+      console.error(err);
+    }
+  }
+
+  function downloadQR(){
+    const c = preview.querySelector('canvas');
+    if(!c) return alert('Generér først QR-koden.');
+    const a = document.createElement('a');
+    a.href = c.toDataURL();
+    a.download = 'qr_v9_1_PRO.png';
+    a.click();
+  }
+
+  async function copyQR(){
+    const c = preview.querySelector('canvas');
+    if(!c) return alert('Generér først QR-koden.');
+    c.toBlob(async (blob)=>{
+      try{
+        await navigator.clipboard.write([ new ClipboardItem({ 'image/png': blob }) ]);
+        alert('QR-kode kopieret.');
+      }catch(e){
+        alert('Kopi mislykkedes: ' + (e && e.message ? e.message : e));
+      }
+    });
+  }
+
+  function resetFields(){
+    templateFields.querySelectorAll('input, select, textarea').forEach(f=>f.value='');
+    overlayInput.value='';
+    preview.innerHTML='';
+  }
+
+  templateSelect.addEventListener('change', renderTemplateFields);
+  btnGenerate.addEventListener('click', generateQR);
+  btnUpdate.addEventListener('click', generateQR);
+  btnDownload.addEventListener('click', downloadQR);
+  btnCopy.addEventListener('click', copyQR);
+  btnReset.addEventListener('click', resetFields);
+
+  renderTemplateFields();
+});
+</script>
+</body>
+</html>
