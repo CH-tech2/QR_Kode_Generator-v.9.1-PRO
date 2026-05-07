@@ -1,10 +1,10 @@
-<!-- v9.1_PRO: single corrected build with Samsung/iPhone compact payload and 13% logo -->
+<!-- v9.2_PRO: single corrected build with Samsung/iPhone compact payload and 13% logo -->
 <!DOCTYPE html>
 <html lang="da">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>QR-kode Generator — v9.1 PRO</title>
+<title>QR-kode Generator — v9.2 PRO</title>
 <style>
   body{font-family:Arial,monospace;background:#f9fafb;margin:0;padding:18px;color:#111827;}
   h1{font-size:24px;margin-bottom:6px;}
@@ -31,7 +31,7 @@
 <body>
 <div class="wrap">
   <div class="card">
-    <h1>QR-kode Generator — v9.1 PRO</h1>
+    <h1>QR-kode Generator — v9.2 PRO</h1>
     <div class="muted">Alle skabeloner + ubeskadiget sort/hvid ROCKWOOL-logo indlejret (13% bredde, korrekt aspect ratio).</div>
 
     <label for="template">Skabelon</label>
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       <label>1) Område</label><input id="lagerOmr" type="text" placeholder="Område">
       <label>2) Varenummer</label><input id="lagerVnr" type="text" placeholder="Varenummer">
       <label>3) Materiale</label><input id="lagerMat" type="text" placeholder="Materiale">
-      <label>3,1) Operatør info</label><input id="lagerOperatoer" type="text" placeholder="Operatør">
+      <label>3,1) Materiale info</label><input id="lagerOperatoer" type="text" placeholder="Materiale">
       <label>4) Antal</label>
       <div class="row">
         <input id="lagerAntal" class="flex1" type="text" placeholder="Antal">
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if(omr) parts.push(`O:${omr}`);
       if(vnr) parts.push(`VN:${vnr}`);
       if(mat) parts.push(`MA:${mat}`);
-      if(oper) parts.push(`OP:${oper}`);
+      if(oper) parts.push(`MI:${oper}`);
       if(antal){
         let aval = antal;
         if(enhed) aval += enhed;
@@ -273,7 +273,7 @@ END:VCARD`;
     if(!c) return alert('Generér først QR-koden.');
     const a = document.createElement('a');
     a.href = c.toDataURL();
-    a.download = 'qr_v9_1_PRO.png';
+    a.download = 'qr_v9_2_PRO.png';
     a.click();
   }
 
